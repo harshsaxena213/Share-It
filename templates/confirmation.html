@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Register</title>
+  <title>Confirmation</title>
   <link rel="stylesheet" href="./static/styles.css">
 </head>
 <body>
@@ -14,14 +14,12 @@
 </nav>
 
 
-<h1>Register</h1>
-<form id="registerForm" action="/register_data" method="POST">
-  <input type="text" name="username" placeholder="Choose username" required>
-  <input type="password" name="password" placeholder="Choose password" required>
-  <button type="submit">Register</button>
-</form>
+<h1>Share-It</h1>
+    <p>{{status}}</p>
+    <p>{{username}}</p>
+    <p>{{password}}</p>
 <div class="success" id="successMsg"></div>
 <div class="error" id="errorMsg"></div>
-<!-- <script src="./static/main.js"></script> -->
+<script src="./static/main.js"></script>
 </body>
 </html>
