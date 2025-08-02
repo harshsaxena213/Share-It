@@ -16,6 +16,11 @@
 
 <h1>Your Files</h1>
 <div id="fileList"></div>
-<script src="./static/main.js"></script>
+<ul>
+{{#files}}
+    <li>ID: {{id}}, Filename: {{filename}}</li>
+{{/files}}
+</ul>
+<!-- <script src="./static/main.js"></script> -->
 </body>
 </html>

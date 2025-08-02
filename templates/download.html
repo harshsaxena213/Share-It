@@ -14,11 +14,11 @@
 </nav>
 
 <h1>Download a File</h1>
-<form id="downloadForm">
+<form id="downloadForm" method="POST" action="/download_data">
   <input type="text" name="fileid" placeholder="Enter File ID" required>
   <button type="submit">Download</button>
 </form>
 <div class="error" id="errorMsg"></div>
-<script src="./static/main.js"></script>
+<!-- <script src="./static/main.js"></script> -->
 </body>
 </html>
