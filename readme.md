@@ -2,6 +2,7 @@
 
 A modern, secure, minimalist **file storage and sharing web application** built with a **Crow C++ backend** and a sleek frontend UI crafted using **Perplexity AI** and **Claude**.  
 Data storage with **SQLite** and password security using salted SHA-256 hashes.
+
 [![Watch Demo Video](https://img.shields.io/badge/Watch-Demo-blue)](https://project.harshishere.in.net/player.html?video=Share-It%20.mp4)
 ---
 
