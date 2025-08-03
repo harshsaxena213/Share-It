@@ -3,25 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <title>Upload File</title>
-  <link rel="stylesheet" href="./static/styles.css">
+    <script src="/static/main.js"></script>
+    <link rel="stylesheet" href="./static/styles.css">
 </head>
 <body>
-<nav>
-  <a href="/upload">Upload</a>
-  <a href="/files">My Files</a>
-  <a href="/login">Login</a>
-  <a href="/register">Register</a>
-</nav>
+
+    <nav>
+        <div class="nav-container">
+            <a href="/" class="logo">ShareFlow</a>
+            <ul class="nav-links">
+                <!-- <li><a href="/upload">Upload</a></li> -->
+                <li><a href="/files">My Files</a></li>
+                <li><a href="/download">Download</a></li>
+                <!-- <li><a href="/login">Login</a></li> -->
+                <!-- <li><a href="/register">Register</a></li> -->
+            </ul>
+        </div>
+    </nav>
 
 
-
-<h1>Upload a File</h1>
-<form id="uploadForm" enctype="multipart/form-data" action="/upload_data" method="POST">
-  <input type="file" name="file" required>
-  <button type="submit">Upload</button>
-</form>
-<div class="success" id="successMsg"></div>
-<div class="error" id="errorMsg"></div>
+<main>
+        <div class="container" id="uploadPage" style="display: none;">
+            <h1>Upload Files</h1>
+            <form id="uploadForm" method="POST" action="/upload_data">
+                <div class="file-upload">
+                    <input type="file" id="fileInput" name="file" required>
+                    <label for="fileInput" class="file-upload-label">
+                        <span class="file-upload-icon">📁</span>
+                        <span class="file-upload-text">Click to select file</span>
+                        <span class="file-upload-subtext">or drag and drop here</span>
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">Upload File</button>
+            </form>
+            <div class="loading" id="uploadLoading">
+                <div class="spinner"></div>
+                <p style="color: white; margin-top: 1rem;">Uploading your file...</p>
+            </div>
+            <div id="uploadMessage"></div>
+        </div>
+</main>
 <script src="./static/upload.js"></script>
+<!-- <script src="./static/confirm.js"></script> -->
 </body>
 </html>

@@ -35,14 +35,10 @@ int main()
         if(isLoged){
             session.set("logged_in", true);
             session.set("username", username);
-            auto load_page=crow::mustache::load("confirmation.html");
-            crow::mustache::context ctx;
-            ctx={{"status","You Are Logged In!"}};
-            std::string page_html = load_page.render(ctx).dump();
-            res.set_header("Content-Type", "text/html");
-            res.write(page_html);
+            res.code = 302;
+            res.set_header("Location", "/upload");
             res.end();
-
+        
         } });
 
     CROW_ROUTE(app, "/register")([]()
@@ -59,12 +55,11 @@ int main()
                                                                           bool isRegister = Register(username, password);
                                                                           if (isRegister)
                                                                           {
-                                                                              crow::mustache::context ctx;
-                                                                              ctx = {{"status", "Registered!"}};
-                                                                              std::string page_html = load_page.render(ctx).dump();
-                                                                              res.set_header("Content-Type", "text/html");
-                                                                              res.write(page_html);
-                                                                              res.end();
+                                            
+                                                                                
+                                                                                res.code = 302;
+                                                                                res.set_header("Location", "/login");
+                                                                                res.end();
                                                                           }
                                                                           else
                                                                           {
@@ -84,59 +79,54 @@ int main()
                 res.end();
         }
         else{
-                crow::mustache::context ctx;
-                ctx["status"] = "Login Please!";
-                auto load_page = crow::mustache::load("confirmation.html");
-                std::string page_html = load_page.render(ctx).dump();
-                res.write(page_html);
-                res.end();
-        } 
-    });
+        res.code = 302;
+        res.set_header("Location", "/login");
+        res.end();
+        } });
 
-    CROW_ROUTE(app, "/download")([&app](crow::request& req,crow::response& res)
+    CROW_ROUTE(app, "/download")([&app](crow::request &req, crow::response &res)
                                  {
     auto& session = app.get_context<Session>(req);
     bool logged_in = session.get("logged_in", false);
     if(!logged_in){
-        crow::mustache::context ctx;
-        ctx["status"] = "Login Please!";
-        auto load_page = crow::mustache::load("confirmation.html");
-        std::string page_html = load_page.render(ctx).dump();
-
-        res.set_header("Content-Type", "text/html");
-        res.write(page_html);
-        res.end();
-        return;      
+            res.code = 302;
+            res.set_header("Location", "/login");
+            res.end();  
     }          
      
     auto load_page=crow::mustache::load("download.html");
     std::string page_html = load_page.render().dump();
     res.write(page_html);
-    res.end();
-    });
+    res.end(); });
 
-    CROW_ROUTE(app, "/files")([&app](crow::request& req,crow::response& res)
-    {
-        auto& session=app.get_context<Session>(req);
-        bool logged_in=session.get("logged_in",false);
-        std::string username=session.get("username","guest");
-        if(!logged_in || username=="guest"){
-            res.code=400;
-            res.write("Please Login!");
+    CROW_ROUTE(app, "/files")([&app](crow::request &req, crow::response &res)
+                              {
+    auto& session = app.get_context<Session>(req);
+    bool logged_in = session.get("logged_in", false);
+    std::string username = session.get("username", "guest");
+    
+    if (!logged_in || username == "guest") {
+            res.code = 302;
+            res.set_header("Location", "/login");
             res.end();
-            return;
-        }
-        else{
-            auto ctx = ListFiles(username);
-            auto html = crow::mustache::load("files.html").render(ctx).dump();
-            res.set_header("Content-Type", "text/html");
-            res.write(html);
-            res.end();
-            return;
-        }
-    });
+    }
+    else {
+        
+        auto files_vector = ListFiles(username);
+        
+        
+        crow::mustache::context ctx;
+        ctx["files"] = std::move(files_vector);
+        
+        auto html = crow::mustache::load("files.html").render(ctx).dump();
+        res.set_header("Content-Type", "text/html");
+        res.write(html);
+        res.end();
+        return;
+    } });
 
-CROW_ROUTE(app, "/upload_data").methods(crow::HTTPMethod::POST)([&app](crow::request& req, crow::response& res) {
+    CROW_ROUTE(app, "/upload_data").methods(crow::HTTPMethod::POST)([&app](crow::request &req, crow::response &res)
+                                                                    {
    
     auto& session = app.get_context<Session>(req);
     bool logged_in = session.get("logged_in", false);
@@ -185,56 +175,57 @@ CROW_ROUTE(app, "/upload_data").methods(crow::HTTPMethod::POST)([&app](crow::req
 
     res.code = 200;
     res.write("File uploaded successfully");
-    res.end();
-});
+    res.end(); });
 
+    CROW_ROUTE(app, "/download_data").methods(crow::HTTPMethod::POST)([&app](crow::request &req, crow::response &res)
+                                                                      {
+                                                                          auto parameters = req.get_body_params();
+                                                                          std::string fileid_str = parameters.get("fileid");
+                                                                          int fileid = 0;
+                                                                          try
+                                                                          {
+                                                                              fileid = std::stoi(fileid_str);
+                                                                          }
+                                                                          catch (...)
+                                                                          {
+                                                                              res.code = 400;
+                                                                              res.write("Invalid file ID");
+                                                                              res.end();
+                                                                              return;
+                                                                          }
+                                                                          std::string filename = fileid_to_filename(fileid);
+                                                                          if (filename.empty())
+                                                                          {
+                                                                              res.code = 404;
+                                                                              res.write("File not found");
+                                                                              res.end();
+                                                                              return;
+                                                                          }
+                                                                          std::string filepath = "uploads/" + filename;
+                                                                          if (!std::filesystem::exists(filepath))
+                                                                          {
+                                                                              res.code = 404;
+                                                                              res.write("File Not Found");
+                                                                              res.end();
+                                                                              return;
+                                                                          }
+                                                                          std::ifstream file_stream(filepath, std::ios::binary);
+                                                                          if (!file_stream)
+                                                                          {
+                                                                              res.code = 500;
+                                                                              res.write("Failed to open file");
+                                                                              res.end();
+                                                                              return;
+                                                                          }
+                                                                          std::ostringstream oss;
+                                                                          oss << file_stream.rdbuf();
+                                                                          std::string file_content = oss.str();
+                                                                          res.set_header("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+                                                                          res.set_header("Content-Type", "application/octet-stream");
+                                                                          res.set_header("Content-Length", std::to_string(file_content.size()));
 
-CROW_ROUTE(app, "/download_data").methods(crow::HTTPMethod::POST)([&app](crow::request& req, crow::response& res) {
-        auto parameters=req.get_body_params();
-        std::string fileid_str =parameters.get("fileid");
-        int fileid = 0;
-    try {
-        fileid = std::stoi(fileid_str);
-    } catch (...) {
-        res.code = 400;
-        res.write("Invalid file ID");
-        res.end();
-        return;
-    }
-    std::string filename = fileid_to_filename(fileid);
-        if (filename.empty()) {
-        res.code = 404;
-        res.write("File not found");
-        res.end();
-        return;
-    }
-    std::string filepath = "uploads/" + filename;
-    if(!std::filesystem::exists(filepath)){
-        res.code=404;
-        res.write("File Not Found");
-        res.end();
-        return;
-    }
-    std::ifstream file_stream(filepath, std::ios::binary);
-    if (!file_stream) {
-        res.code = 500;
-        res.write("Failed to open file");
-        res.end();
-        return;
-    }
-    std::ostringstream oss;
-    oss << file_stream.rdbuf();
-    std::string file_content = oss.str();
-    res.set_header("Content-Disposition", "attachment; filename=\"" + filename + "\"");
-    res.set_header("Content-Type", "application/octet-stream");
-    res.set_header("Content-Length", std::to_string(file_content.size()));
-
-    res.write(file_content);
-    res.end();
-
-});
-
-
+                                                                          res.write(file_content);
+                                                                          res.end(); });
 
     app.port(8080).multithreaded().run();
 }

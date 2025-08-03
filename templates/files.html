@@ -1,26 +1,119 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>My Files</title>
-  <link rel="stylesheet" href="./static/styles.css">
+    <meta charset="UTF-8">
+    <title>My Files</title>
+    <script src="/static/main.js"></script>
+    <link rel="stylesheet" href="./static/styles.css">
 </head>
 <body>
-<nav>
-  <a href="/upload">Upload</a>
-  <a href="/files">My Files</a>
-  <a href="/login">Login</a>
-  <a href="/register">Register</a>
-</nav>
+    <nav>
+        <div class="nav-container">
+            <a href="/" class="logo">Share-It</a>
+            <ul class="nav-links">
+                <li><a href="/upload">Upload</a></li>
+                <!-- <li><a href="/files">My Files</a></li> -->
+                <li><a href="/download">Download</a></li>
+                <!-- <li><a href="/login">Login</a></li> -->
+                <!-- <li><a href="/register">Register</a></li> -->
+            </ul>
+        </div>
+    </nav>
+    
+    <main>
+        <div class="container" id="filesPage">
+            <h1>My Files</h1>
+            <div class="file-list" id="fileList">
+                <ul class="files-ul">
+                    {{#files}}
+                    <li class="file-list-item">
+                        <span class="file-id">ID: {{id}}</span>
+                        <span class="file-name">{{filename}}</span>
+                    </li>
+                    {{/files}}
+                </ul>
+            </div>
+            <div id="filesMessage"></div>
+        </div>
+    </main>
 
+    <style>
+        /* Custom styles for the file list to match the CSS theme */
+        .files-ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
 
-<h1>Your Files</h1>
-<div id="fileList"></div>
-<ul>
-{{#files}}
-    <li>ID: {{id}}, Filename: {{filename}}</li>
-{{/files}}
-</ul>
-<!-- <script src="./static/main.js"></script> -->
+        .file-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .file-list-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(10px);
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.2);
+        }
+
+        .file-id {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            background: rgba(102, 126, 234, 0.3);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .file-name {
+            font-weight: 600;
+            font-size: 1rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* Animation for list items */
+        .file-list-item:nth-child(1) { animation-delay: 0.1s; }
+        .file-list-item:nth-child(2) { animation-delay: 0.2s; }
+        .file-list-item:nth-child(3) { animation-delay: 0.3s; }
+        .file-list-item:nth-child(4) { animation-delay: 0.4s; }
+        .file-list-item:nth-child(5) { animation-delay: 0.5s; }
+
+        /* Empty state styling */
+        .files-ul:empty::after {
+            content: "No files uploaded yet";
+            display: block;
+            text-align: center;
+            padding: 3rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-style: italic;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .file-list-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .file-name {
+                word-break: break-all;
+            }
+        }
+    </style>
+
 </body>
 </html>

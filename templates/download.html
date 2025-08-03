@@ -1,24 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Download File</title>
-  <link rel="stylesheet" href="./static/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share-It</title>
+        <script src="/static/main.js"></script>
+    <link rel="stylesheet" href="./static/styles.css">
 </head>
 <body>
-<nav>
-  <a href="/upload">Upload</a>
-  <a href="/files">My Files</a>
-  <a href="/login">Login</a>
-  <a href="/register">Register</a>
-</nav>
+    <nav>
+        <div class="nav-container">
+            <a href="/" class="logo">Share-It</a>
+            <ul class="nav-links">
+                <li><a href="/upload">Upload</a></li>
+                <li><a href="/files">My Files</a></li>
+                <!-- <li><a href="">Download</a></li> -->
+                <!-- <li><a href="/login">Login</a></li> -->
+                <!-- <li><a href="/register">Register</a></li> -->
+            </ul>
+        </div>
+    </nav>
 
-<h1>Download a File</h1>
-<form id="downloadForm" method="POST" action="/download_data">
-  <input type="text" name="fileid" placeholder="Enter File ID" required>
-  <button type="submit">Download</button>
-</form>
-<div class="error" id="errorMsg"></div>
+<main>
+        <div class="container" id="downloadPage" style="display: none;">
+            <h1>Download File</h1>
+            <form id="downloadForm" action="/download_data" method="POST">
+                <div class="form-group">
+                    <input type="text" name="fileid" placeholder="Enter File ID" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Download</button>
+            </form>
+            <div class="loading" id="downloadLoading">
+                <div class="spinner"></div>
+                <p style="color: white; margin-top: 1rem;">Preparing download...</p>
+            </div>
+            <div id="downloadMessage"></div>
+        </div>
+</main>
 <!-- <script src="./static/main.js"></script> -->
 </body>
 </html>

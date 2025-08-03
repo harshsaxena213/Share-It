@@ -13,11 +13,11 @@ document.getElementById('uploadForm').addEventListener('submit', function(e) {
     xhr.setRequestHeader("X-Filename", file.name);
     xhr.onload = () => {
         if (xhr.status === 200) {
-            console.log("Upload successful");
-            document.getElementById('successMsg').textContent = "Upload successful!";
+            alert("Upload successful");
+            document.getElementById('successMsg').alert = "Upload successful!";
             document.getElementById('errorMsg').textContent = "";
         } else {
-            console.error("Upload failed");
+            alert("Upload failed");
             document.getElementById('errorMsg').textContent = "Upload failed!";
             document.getElementById('successMsg').textContent = "";
         }

@@ -1,92 +1,132 @@
-// Upload
-if (document.getElementById('uploadForm')) {
-    document.getElementById('uploadForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const file = this.file.files[0];
-        document.getElementById('successMsg').textContent = '';
-        document.getElementById('errorMsg').textContent = '';
-        const fd = new FormData();
-        fd.append('file', file);
-        try {
-            const res = await fetch('/upload', { method: 'POST', body: fd });
-            if (!res.ok) throw new Error();
-            const {fileid, filename} = await res.json();
-            document.getElementById('successMsg').innerHTML = `Uploaded! <a target="_blank" href="/download/${fileid}">${filename}</a>`;
-        } catch { document.getElementById('errorMsg').textContent = 'Upload failed.'; }
-    });
-}
-
-// Login
-if (document.getElementById('loginForm')) {
-    document.getElementById('loginForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        document.getElementById('successMsg').textContent = '';
-        document.getElementById('errorMsg').textContent = '';
-        const data = {
-            username: this.username.value,
-            password: this.password.value
-        };
-        try {
-            const res = await fetch('/login', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
+       // Page navigation
+        function showPage(pageName) {
+            // Hide all pages
+            const pages = ['welcomePage', 'loginPage', 'registerPage', 'uploadPage', 'filesPage', 'downloadPage'];
+            pages.forEach(page => {
+                const element = document.getElementById(page);
+                if (element) {
+                    element.style.display = 'none';
+                }
             });
-            if (!res.ok) throw new Error();
-            document.getElementById('successMsg').textContent = 'Login successful!';
-        } catch { document.getElementById('errorMsg').textContent = 'Login failed.'; }
-    });
-}
 
-// Register
-if (document.getElementById('registerForm')) {
-    document.getElementById('registerForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        document.getElementById('successMsg').textContent = '';
-        document.getElementById('errorMsg').textContent = '';
-        const data = {
-            username: this.username.value,
-            password: this.password.value
-        };
-        try {
-            const res = await fetch('/register', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
-            });
-            if (!res.ok) throw new Error();
-            document.getElementById('successMsg').textContent = 'Registration successful!';
-        } catch { document.getElementById('errorMsg').textContent = 'Registration failed.'; }
-    });
-}
-
-// Download
-if (document.getElementById('downloadForm')) {
-    document.getElementById('downloadForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const fileid = this.fileid.value.trim();
-        if (fileid) {
-            window.open(`/download/${fileid}`, "_blank");
-        } else {
-            document.getElementById('errorMsg').textContent = 'Please enter a file ID.';
+            // Show selected page
+            const targetPage = document.getElementById(pageName + 'Page');
+            if (targetPage) {
+                targetPage.style.display = 'block';
+                targetPage.style.animation = 'fadeInUp 0.8s ease-out';
+            }
         }
-    });
-}
 
-// File list
-if (document.getElementById('fileList')) {
-    (async function(){
-        try {
-            const res = await fetch('/files');
-            if (!res.ok) throw new Error();
-            const files = await res.json();
-            let html = '';
-            files.forEach(f => {
-                html += `<div><a class="file-link" href="/download/${f.fileid}" target="_blank">${f.filename}</a> (${f.size} bytes)</div>`;
-            });
-            document.getElementById('fileList').innerHTML = html.length ? html : 'No files.';
-        } catch {
-            document.getElementById('fileList').innerHTML = 'Could not load files.';
+        // Show message
+        function showMessage(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="message ${type}">${message}</div>`;
+            setTimeout(() => {
+                element.innerHTML = '';
+            }, 5000);
         }
-    })();
-}
+
+        // Show loading
+        function showLoading(elementId, show) {
+            const element = document.getElementById(elementId);
+            element.style.display = show ? 'block' : 'none';
+        }
+
+        // File upload drag and drop
+        const fileInput = document.getElementById('fileInput');
+        const fileUploadLabel = document.querySelector('.file-upload-label');
+
+        if (fileUploadLabel) {
+            fileUploadLabel.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileUploadLabel.style.background = 'rgba(255, 255, 255, 0.3)';
+                fileUploadLabel.style.borderColor = 'var(--accent)';
+            });
+
+            fileUploadLabel.addEventListener('dragleave', () => {
+                fileUploadLabel.style.background = 'rgba(255, 255, 255, 0.1)';
+                fileUploadLabel.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+            });
+
+            fileUploadLabel.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    updateFileLabel(files[0].name);
+                }
+                fileUploadLabel.style.background = 'rgba(255, 255, 255, 0.1)';
+                fileUploadLabel.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+            });
+        }
+
+        if (fileInput) {
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    updateFileLabel(e.target.files[0].name);
+                }
+            });
+        }
+
+        function updateFileLabel(filename) {
+            const textElement = document.querySelector('.file-upload-text');
+            const subtextElement = document.querySelector('.file-upload-subtext');
+            if (textElement && subtextElement) {
+                textElement.textContent = filename;
+                subtextElement.textContent = 'Click to change file';
+            }
+        }
+
+        // Form handlers (you'll need to connect these to your backend)
+        document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading('loginLoading', true);
+        
+        });
+
+        document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading('registerLoading', true);
+            
+
+        });
+
+        // document.getElementById('uploadForm')?.addEventListener('submit', async (e) => {
+        //     e.preventDefault();
+        //     showLoading('uploadLoading', true);
+            
+        // });
+
+        document.getElementById('downloadForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading('downloadLoading', true);
+            
+            // Simulate download
+            setTimeout(() => {
+                showLoading('downloadLoading', false);
+                showMessage('downloadMessage', 'Download started!', 'success');
+            }, 1500);
+        });
+
+        // Navigation click handlers
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get current page from URL or default to welcome
+            const currentPage = window.location.pathname.substring(1) || 'welcome';
+            showPage(currentPage);
+        });
+
+        // Handle navigation clicks
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = link.getAttribute('href').substring(1) || 'welcome';
+                showPage(page);
+                history.pushState(null, '', `/${page}`);
+            });
+        });
+
+        // Handle browser back/forward
+        window.addEventListener('popstate', () => {
+            const currentPage = window.location.pathname.substring(1) || 'welcome';
+            showPage(currentPage);
+        });
