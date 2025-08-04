@@ -15,7 +15,7 @@ Data storage with **SQLite** and password security using salted SHA-256 hashes.
 - 📂 **User File Management:** View and manage your personal uploaded files  
 - ⚡ **Fast & Lightweight:** Powered by Crow C++ HTTP server, ensuring high performance  
 - 🎨 Stylish animations, glassmorphism, neon UI elements for an appealing look  
-
+- 🗑️ File Delete: Easily delete unwanted files securely
 ---
 
 ## 🛠️ Tech Stack
@@ -42,13 +42,13 @@ Data storage with **SQLite** and password security using salted SHA-256 hashes.
 │ ├── upload.h
 │ ├── download.h 
 │ └── files.h
+│ └── delete.h
 ├── static/ 
 │ ├── styles.css 
 │ ├── main.js 
 │ └── upload.js 
 ├── templates/
 ├── uploads/ 
-└── db/ 
 ├── db.sqlite 
 └── file.sqlite 
 
@@ -70,7 +70,7 @@ Data storage with **SQLite** and password security using salted SHA-256 hashes.
 ### Build & Run
 
 ```
-g++ main.cpp -o filevault -std=c++20 -lcrow -lsqlite3 -lssl -lcrypto -lpthread
+g++ main.cpp -o filevault -std=c++20 -lcrow -lsqlite3 -lssl -lcrypto 
 ```
 
 Access the application at http://localhost:8080

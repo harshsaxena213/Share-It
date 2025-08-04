@@ -1,7 +1,7 @@
        // Page navigation
         function showPage(pageName) {
             // Hide all pages
-            const pages = ['welcomePage', 'loginPage', 'registerPage', 'uploadPage', 'filesPage', 'downloadPage'];
+            const pages = ['welcomePage', 'loginPage', 'registerPage', 'uploadPage', 'filesPage', 'downloadPage','deletePage'];
             pages.forEach(page => {
                 const element = document.getElementById(page);
                 if (element) {
@@ -102,10 +102,15 @@
             showLoading('downloadLoading', true);
             
             // Simulate download
-            setTimeout(() => {
-                showLoading('downloadLoading', false);
-                showMessage('downloadMessage', 'Download started!', 'success');
-            }, 1500);
+
+        });
+
+        document.getElementById('deleteForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading('deleteit', true);
+            
+            // Simulate download
+
         });
 
         // Navigation click handlers

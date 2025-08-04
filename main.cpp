@@ -8,6 +8,7 @@
 #include <filesystem>
 #include "include/upload.h"
 #include "include/files.h"
+#include "include/delete.h"
 
 using Session = crow::SessionMiddleware<crow::InMemoryStore>;
 
@@ -97,7 +98,8 @@ int main()
     auto load_page=crow::mustache::load("download.html");
     std::string page_html = load_page.render().dump();
     res.write(page_html);
-    res.end(); });
+    res.end();
+ });
 
     CROW_ROUTE(app, "/files")([&app](crow::request &req, crow::response &res)
                               {
@@ -227,5 +229,48 @@ int main()
                                                                           res.write(file_content);
                                                                           res.end(); });
 
-    app.port(8080).multithreaded().run();
+    CROW_ROUTE(app,"/delete")([&app](crow::request& req,crow::response& res){
+        auto& session = app.get_context<Session>(req);
+        bool logged_in = session.get("logged_in", false);
+        if(logged_in){
+                auto load_page=crow::mustache::load("delete.html");
+                std::string page_html = load_page.render().dump();
+                res.write(page_html);
+                res.end();
+        }
+        else{
+            res.code=302;
+            res.set_header("Location", "/login");
+            res.end();
+        }
+    });              
+
+    CROW_ROUTE(app,"/delete_data").methods(crow::HTTPMethod::POST)([](crow::request& req,crow::response& res){
+            auto parameters=req.get_body_params();
+            std::string fileid_str_delete=parameters.get("fileid");
+            int fileid = 0;                                                           
+            int fileid_delete = std::stoi(fileid_str_delete);                                                              
+            std::string file_name=delete_file(fileid_delete);
+            if(!file_name.empty()){
+                    std::string filepath = "./uploads/" + file_name;
+                    if (std::remove(filepath.c_str()) != 0) {
+                        if (std::remove(filepath.c_str()) != 0) {
+                                CROW_LOG_INFO << "Failed to delete the file from filesystem: " << filepath 
+                                << ", reason: " << std::strerror(errno);
 }
+                    CROW_LOG_INFO << "Failed to delete the file from filesystem: " << filepath;
+    }
+                res.code=200;
+                res.write("File Deleted successfully");
+                res.end(); 
+            }
+            else{
+                res.code=404;
+                res.write("No File For That File Id!");
+                res.end();
+            }
+
+        
+    });  
+    app.port(8080).multithreaded().run();
+}                                                                              
